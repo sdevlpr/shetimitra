@@ -1,102 +1,65 @@
-<!DOCTYPE html>
-<html lang="mr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>कामगार शोधा</title>
-<link rel="stylesheet" href="css/style.css">
-</head>
 
-<body>
-
-<header class="navbar">
-<div class="logo">🌾 शेतकरी कामगार सेवा</div>
-
-<nav>
-<a href="index.html">मुख्यपृष्ठ</a>
-<a href="find-worker.html">कामगार शोधा</a>
-<a href="add-worker.html">कामगार जोडा</a>
-<a href="requirement.html">कामगाराची मागणी</a>
-</nav>
-</header>
-
-<main class="page">
-
-<div class="page-heading">
-<span>FIND WORKER</span>
-<h1>तुमच्या कामासाठी कामगार शोधा</h1>
-<p>नाव, गाव किंवा कामाच्या प्रकारानुसार शोधा.</p>
-</div>
-
-<div class="search-box">
-
-<input
-type="text"
-id="searchWorker"
-placeholder="🔎 नाव / गाव / कामाचा प्रकार शोधा..."
->
-
-<select id="skillFilter">
-<option value="">सर्व काम</option>
-<option>शेती काम</option>
-<option>भाजीपाला काम</option>
-<option>फळबाग काम</option>
-<option>कापणी</option>
-<option>लागवड</option>
-<option>तण काढणे</option>
-<option>ट्रॅक्टर काम</option>
-<option>इतर</option>
-</select>
-
-</div>
-
-<div id="workerResults" class="worker-grid"></div>
-
-</main>
-
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="js/app.js"></script>
 
 <script>
+let allWorkers = [];
 
-function searchWorkers(){
+async function loadWorkers() {
+  const results = document.getElementById("workerResults");
 
-const text =
-document.getElementById("searchWorker").value
-.toLowerCase()
-.trim();
+  results.textContent = "कामगारांची माहिती लोड होत आहे...";
 
-const skill =
-document.getElementById("skillFilter").value;
-
-const workers = getWorkers();
-
-const result = workers.filter(w => {
-
-const matchesText =
-!text ||
-w.name.toLowerCase().includes(text) ||
-w.village.toLowerCase().includes(text) ||
-w.skill.toLowerCase().includes(text);
-
-const matchesSkill =
-!skill || w.skill === skill;
-
-return matchesText && matchesSkill;
-
-});
-
-renderWorkerData("workerResults", result);
-
+  try {
+    allWorkers = await getWorkers();
+    searchWorkers();
+  } catch (error) {
+    console.error("कामगार लोड करण्याची त्रुटी:", error);
+    results.textContent =
+      "कामगारांची माहिती मिळाली नाही. कृपया पेज Refresh करा.";
+  }
 }
 
-document.getElementById("searchWorker")
-.addEventListener("input", searchWorkers);
+function searchWorkers() {
+  const text = document
+    .getElementById("searchWorker")
+    .value.toLowerCase()
+    .trim();
 
-document.getElementById("skillFilter")
-.addEventListener("change", searchWorkers);
+  const skill = document.getElementById("skillFilter").value;
 
-searchWorkers();
+  const result = allWorkers.filter(w => {
+    const name = (w.name || "").toLowerCase();
+    const village = (w.village || "").toLowerCase();
+    const workerSkill = (w.skill || "").toLowerCase();
+    const district = (w.district || "").toLowerCase();
 
+    const matchesText =
+      !text ||
+      name.includes(text) ||
+      village.includes(text) ||
+      workerSkill.includes(text) ||
+      district.includes(text);
+
+    const matchesSkill = !skill || w.skill === skill;
+
+    return matchesText && matchesSkill;
+  });
+
+  renderWorkerData("workerResults", result);
+}
+
+document
+  .getElementById("searchWorker")
+  .addEventListener("input", searchWorkers);
+
+document
+  .getElementById("skillFilter")
+  .addEventListener("change", searchWorkers);
+
+loadWorkers();
 </script>
 
 </body>
