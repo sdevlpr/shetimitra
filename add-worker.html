@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -19,149 +20,97 @@
 </header>
 
 <main class="form-page">
+  <div class="form-container">
+    <div class="form-header">
+      <span>WORKER REGISTRATION</span>
+      <h1>नवीन कामगार जोडा</h1>
+      <p>कामगाराची योग्य माहिती भरून नोंदणी करा.</p>
+    </div>
 
-<div class="form-container">
+    <form id="workerForm">
+      <div class="form-grid">
 
-<div class="form-header">
-  <span>WORKER REGISTRATION</span>
-  <h1>नवीन कामगार जोडा</h1>
-  <p>कामगाराची योग्य माहिती भरून नोंदणी करा.</p>
-</div>
+        <div class="field">
+          <label for="workerName">कामगाराचे पूर्ण नाव *</label>
+          <input type="text" id="workerName" required>
+        </div>
 
-<form id="workerForm">
+        <div class="field">
+          <label for="workerMobile">मोबाईल नंबर *</label>
+          <input type="tel" id="workerMobile"
+                 maxlength="10" inputmode="numeric" required>
+        </div>
 
-<div class="form-grid">
+        <div class="field">
+          <label for="workerVillage">गाव *</label>
+          <input type="text" id="workerVillage" required>
+        </div>
 
-<div class="field">
-<label>कामगाराचे पूर्ण नाव *</label>
-<input type="text" id="workerName" required>
-</div>
+        <div class="field">
+          <label for="workerDistrict">जिल्हा</label>
+          <input type="text" id="workerDistrict">
+        </div>
 
-<div class="field">
-<label>मोबाईल नंबर *</label>
-<input type="tel" id="workerMobile" maxlength="10" required>
-</div>
+        <div class="field">
+          <label for="workerSkill">कामाचा प्रकार *</label>
+          <select id="workerSkill" required>
+            <option value="">निवडा</option>
+            <option>शेती काम</option>
+            <option>भाजीपाला काम</option>
+            <option>फळबाग काम</option>
+            <option>कापणी</option>
+            <option>लागवड</option>
+            <option>तण काढणे</option>
+            <option>ट्रॅक्टर काम</option>
+            <option>इतर</option>
+          </select>
+        </div>
 
-<div class="field">
-<label>गाव *</label>
-<input type="text" id="workerVillage" required>
-</div>
+        <div class="field">
+          <label for="dailyRate">दिवसाचा दर ₹ *</label>
+          <input type="number" id="dailyRate" min="1" required>
+        </div>
 
-<div class="field">
-<label>जिल्हा</label>
-<input type="text" id="workerDistrict">
-</div>
+        <div class="field">
+          <label for="standardHours">दररोजचे मानक तास</label>
+          <input type="number" id="standardHours"
+                 value="8" min="1" max="24">
+        </div>
 
-<div class="field">
-<label>कामाचा प्रकार *</label>
-<select id="workerSkill" required>
-<option value="">निवडा</option>
-<option>शेती काम</option>
-<option>भाजीपाला काम</option>
-<option>फळबाग काम</option>
-<option>कापणी</option>
-<option>लागवड</option>
-<option>तण काढणे</option>
-<option>ट्रॅक्टर काम</option>
-<option>इतर</option>
-</select>
-</div>
+        <div class="field">
+          <label for="experience">अनुभव</label>
+          <select id="experience">
+            <option>नवीन</option>
+            <option>1 वर्ष</option>
+            <option>2-3 वर्षे</option>
+            <option>4-5 वर्षे</option>
+            <option>5+ वर्षे</option>
+          </select>
+        </div>
 
-<div class="field">
-<label>दिवसाचा दर ₹ *</label>
-<input type="number" id="dailyRate" min="1" required>
-</div>
+      </div>
 
-<div class="field">
-<label>दररोजचे मानक तास</label>
-<input type="number" id="standardHours" value="8" min="1" max="24">
-</div>
+      <div class="checkbox">
+        <input type="checkbox" id="available" checked>
+        <label for="available">सध्या कामासाठी उपलब्ध आहे</label>
+      </div>
 
-<div class="field">
-<label>अनुभव</label>
-<select id="experience">
-<option>नवीन</option>
-<option>1 वर्ष</option>
-<option>2-3 वर्षे</option>
-<option>4-5 वर्षे</option>
-<option>5+ वर्षे</option>
-</select>
-</div>
+      <button type="submit" class="btn primary full">
+        कामगार नोंदणी करा
+      </button>
+    </form>
 
-</div>
-
-<div class="checkbox">
-<input type="checkbox" id="available" checked>
-<label for="available">सध्या कामासाठी उपलब्ध आहे</label>
-</div>
-
-<button type="submit" class="btn primary full">
-  कामगार नोंदणी करा
-</button>
-
-</form>
-
-<div id="workerMessage"></div>
-
-</div>
-
+    <div id="workerMessage" aria-live="polite"></div>
+  </div>
 </main>
 
-<script src="js/app.js"></script>
-
-<script>
-
+<!-- Firebase SDK: हे app.js च्या आधी असणे आवश्यक आहे -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
+<!-- app.js फक्त एकदाच लोड करा -->
 <script src="js/app.js"></script>
-</body>
-</html>
-){
-
-e.preventDefault();
-
-const worker = {
-id: Date.now(),
-name: document.getElementById("workerName").value.trim(),
-mobile: document.getElementById("workerMobile").value.trim(),
-village: document.getElementById("workerVillage").value.trim(),
-district: document.getElementById("workerDistrict").value.trim(),
-skill: document.getElementById("workerSkill").value,
-dailyRate: Number(document.getElementById("dailyRate").value),
-standardHours: Number(document.getElementById("standardHours").value) || 8,
-experience: document.getElementById("experience").value,
-available: document.getElementById("available").checked,
-createdAt: new Date().toLocaleString("en-IN")
-};
-
-if(worker.mobile.length !== 10){
-showMessage("workerMessage","कृपया योग्य 10 अंकी मोबाईल नंबर टाका.","error");
-return;
-}
-
-const workers = getWorkers();
-workers.push(worker);
-localStorage.setItem("farmWorkers", JSON.stringify(workers));
-
-addNotification(
-"नवीन कामगार नोंदणी",
-worker.name + " यांनी कामगार म्हणून नोंदणी केली आहे.",
-worker
-);
-
-showMessage(
-"workerMessage",
-"✅ कामगार यशस्वीरित्या नोंदणीकृत झाला!",
-"success"
-);
-
-this.reset();
-
-});
-</script>
 
 </body>
-
 </html>
