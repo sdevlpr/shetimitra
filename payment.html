@@ -176,8 +176,99 @@ const upiUrl =
 
 document.getElementById("upiButton").href=upiUrl;
 
+
 document.getElementById("confirmPayment")
-.addEventListener("click",function(){
+.addEventListener("click", function () {
+
+  const utr = document.getElementById("utrNumber").value.trim();
+  const screenshot = document.getElementById("paymentScreenshot").files[0];
+
+  if (!utr) {
+    alert("कृपया Transaction ID / UTR नंबर टाका.");
+    return;
+  }
+
+  if (!requirement) {
+    alert("Active requirement सापडली नाही.");
+    return;
+  }
+
+  // तुमचा WhatsApp नंबर येथे टाका:
+  // भारतासाठी 91 + 10 अंकी मोबाइल नंबर, + चिन्ह नको.
+  const adminWhatsApp = "91YOURMOBILENUMBER";
+
+  if (!/^\d{12}$/.test(adminWhatsApp)) {
+    alert("कोडमध्ये तुमचा योग्य WhatsApp नंबर टाका.");
+    return;
+  }
+
+  const booking = {
+    id: Date.now(),
+    requirementId: requirement.id || null,
+    employerName: requirement.employerName || "",
+    mobile: requirement.mobile || "",
+    workersNeeded: requirement.workersNeeded,
+    hours: requirement.workHours,
+    amount: total,
+    utr: utr,
+    status: "Pending Verification",
+    createdAt: new Date().toLocaleString("en-IN")
+  };
+
+  const bookings = JSON.parse(
+    localStorage.getItem("farmBookings") || "[]"
+  );
+
+  bookings.push(booking);
+
+  localStorage.setItem("farmBookings", JSON.stringify(bookings));
+
+  const message =
+    "SHETIMITRA - PAYMENT VERIFICATION REQUEST\n\n" +
+    "Booking ID: " + booking.id + "\n" +
+    "नाव: " + booking.employerName + "\n" +
+    "मोबाइल: " + booking.mobile + "\n" +
+    "ठिकाण: " + (requirement.location || "") + "\n" +
+    "काम: " + (requirement.workType || "") + "\n" +
+    "कामाची तारीख: " + (requirement.workDate || "") + "\n" +
+    "कामगार: " + booking.workersNeeded + "\n" +
+    "तास: " + booking.hours + "\n" +
+    "रक्कम: ₹" + total + "\n" +
+    "UTR / Transaction ID: " + utr + "\n" +
+    "Status: Pending Verification\n\n" +
+    "कृपया बँक/UPI व्यवहार तपासून पेमेंट मंजूर करा.";
+
+  const whatsappURL =
+    "https://wa.me/" + adminWhatsApp +
+    "?text=" + encodeURIComponent(message);
+
+  if (typeof addNotification === "function") {
+    try {
+      addNotification(
+        "Payment Verification Pending",
+        booking.employerName + " यांचे पेमेंट तपासायचे आहे.",
+        booking
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  showMessage(
+    "paymentMessage",
+    "पेमेंट तपासणीसाठी WhatsApp उघडत आहे. बुकिंग अजून मंजूर झालेले नाही.",
+    "success"
+  );
+
+  // WhatsApp उघडा
+  window.open(whatsappURL, "_blank");
+
+  if (screenshot) {
+    alert(
+      "WhatsApp उघडल्यानंतर पेमेंटचा स्क्रीनशॉट स्वतः Attach करून पाठवा."
+    );
+  }
+});
 
 const booking = {
 
