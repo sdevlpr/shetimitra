@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>उत्पन्न</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+<div class="logo">🌾 शेतकरी कामगार सेवा</div>
+
+<nav>
+<a href="index.html">मुख्यपृष्ठ</a>
+<a href="find-worker.html">कामगार शोधा</a>
+<a href="add-worker.html">कामगार जोडा</a>
+<a href="income.html">उत्पन्न</a>
+<a href="notifications.html">🔔 Notifications</a>
+</nav>
+</header>
+
+<main class="page">
+
+<div class="page-heading">
+<span>WORKER INCOME</span>
+<h1>कामगाराचे उत्पन्न</h1>
+<p>कामाचे तास आणि मिळालेले उत्पन्न येथे पाहता येईल.</p>
+</div>
+
+<div class="income-cards">
+
+<div>
+<span>आजचे तास</span>
+<strong id="todayHours">0</strong>
+</div>
+
+<div>
+<span>आजचे उत्पन्न</span>
+<strong id="todayIncome">₹0</strong>
+</div>
+
+<div>
+<span>एकूण काम</span>
+<strong id="totalJobs">0</strong>
+</div>
+
+<div>
+<span>एकूण उत्पन्न</span>
+<strong id="totalIncome">₹0</strong>
+</div>
+
+</div>
+
+<div class="income-table">
+
+<h2>Income History</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>तारीख</th>
+<th>कामगार</th>
+<th>तास</th>
+<th>Payment</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="incomeTable"></tbody>
+
+</table>
+
+</div>
+
+</main>
+
+<script src="js/app.js"></script>
+
+<script>
+
+const bookings =
+JSON.parse(localStorage.getItem("farmBookings")||"[]");
+
+let totalHours=0;
+let totalIncome=0;
+
+bookings.forEach(b=>{
+totalHours+=Number(b.hours)||0;
+totalIncome+=Number(b.amount)||0;
+});
+
+document.getElementById("todayHours").textContent=
+totalHours+" तास";
+
+document.getElementById("todayIncome").textContent=
+"₹"+totalIncome.toLocaleString("en-IN");
+
+document.getElementById("totalJobs").textContent=
+bookings.length;
+
+document.getElementById("totalIncome").textContent=
+"₹"+totalIncome.toLocaleString("en-IN");
+
+const table=document.getElementById("incomeTable");
+
+if(!bookings.length){
+
+table.innerHTML=`
+<tr>
+<td colspan="5">अजून income record उपलब्ध नाही.</td>
+</tr>`;
+
+}else{
+
+bookings.forEach(b=>{
+
+table.innerHTML+=`
+
+<tr>
+
+<td>${escapeHTML(b.createdAt)}</td>
+
+<td>${escapeHTML(b.employerName)}</td>
+
+<td>${b.hours} तास</td>
+
+<td><strong>₹${Number(b.amount).toLocaleString("en-IN")}</strong></td>
+
+<td>
+<span class="status pending">
+${escapeHTML(b.status)}
+</span>
+</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
