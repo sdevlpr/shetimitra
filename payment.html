@@ -85,6 +85,28 @@ style="display:block;width:250px;max-width:100%;height:auto;margin:20px auto;"
 
 </div>
 
+<div class="payment-verification-form">
+  <h3>पेमेंटची पडताळणी</h3>
+
+  <label for="utrNumber">Transaction ID / UTR नंबर *</label>
+  <input
+    type="text"
+    id="utrNumber"
+    placeholder="तुमचा UTR नंबर टाका"
+    maxlength="100"
+    required
+  >
+
+  <label for="paymentScreenshot">पेमेंट स्क्रीनशॉट (ऐच्छिक)</label>
+  <input
+    type="file"
+    id="paymentScreenshot"
+    accept="image/*"
+  >
+
+  <p>पेमेंट तपासल्यानंतरच बुकिंग मंजूर होईल.</p>
+</div>
+  
 <button
 id="confirmPayment"
 class="btn success full">
