@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+<div class="logo">🌾 शेतकरी कामगार सेवा</div>
+
+<nav>
+<a href="index.html">मुख्यपृष्ठ</a>
+<a href="find-worker.html">कामगार शोधा</a>
+<a href="requirement.html">कामगाराची मागणी</a>
+<a href="income.html">उत्पन्न</a>
+</nav>
+</header>
+
+<main class="payment-page">
+
+<div class="payment-container">
+
+<div class="form-header">
+<span>SECURE PAYMENT</span>
+<h1>कामाची रक्कम</h1>
+<p>कामगार कामावर येण्यापूर्वी booking payment पूर्ण करा.</p>
+</div>
+
+<div id="requirementDetails"></div>
+
+<div class="payment-box">
+
+<h2>💳 Payment Summary</h2>
+
+<div class="payment-row">
+<span>कामगार</span>
+<strong id="workerNumber">0</strong>
+</div>
+
+<div class="payment-row">
+<span>कामाचे तास</span>
+<strong id="hours">0</strong>
+</div>
+
+<div class="payment-row">
+<span>एकूण रक्कम</span>
+<strong id="totalAmount">₹0</strong>
+</div>
+
+<hr>
+
+<div class="upi-box">
+
+<h3>UPI Payment</h3>
+
+<p>खालील UPI ID वर payment करा:</p>
+
+<div class="upi-id">
+pratikshadabhade2011@gmail.com
+</div>
+
+<a
+id="upiButton"
+class="btn primary full"
+href="#">
+📱 UPI App मधून Pay करा
+</a>
+
+<div class="qr-area">
+
+<div class="qr-placeholder">
+QR<br>
+PAYMENT
+</div>
+
+<p>QR scan करून payment करा.</p>
+
+</div>
+
+</div>
+
+<button
+id="confirmPayment"
+class="btn success full">
+✓ Payment केल्यानंतर Booking Confirm करा
+</button>
+
+<div id="paymentMessage"></div>
+
+</div>
+
+</div>
+
+</main>
+
+<script src="js/app.js"></script>
+
+<script>
+
+const requirement =
+JSON.parse(localStorage.getItem("selectedRequirement"));
+
+if(!requirement){
+
+document.getElementById("requirementDetails").innerHTML =
+'<div class="alert error">कोणतीही active requirement सापडली नाही.</div>';
+
+}else{
+
+document.getElementById("requirementDetails").innerHTML = `
+
+<div class="requirement-summary">
+
+<h3>📋 Requirement Details</h3>
+
+<p><b>नाव:</b> ${escapeHTML(requirement.employerName)}</p>
+
+<p><b>ठिकाण:</b> ${escapeHTML(requirement.location)}</p>
+
+<p><b>काम:</b> ${escapeHTML(requirement.workType)}</p>
+
+<p><b>तारीख:</b> ${escapeHTML(requirement.workDate)}</p>
+
+</div>
+`;
+
+document.getElementById("workerNumber")
+.textContent=requirement.workersNeeded;
+
+document.getElementById("hours")
+.textContent=requirement.workHours+" तास";
+
+const hourlyRate = 800 / 8;
+
+const total =
+hourlyRate *
+requirement.workHours *
+requirement.workersNeeded;
+
+document.getElementById("totalAmount")
+.textContent="₹"+total.toLocaleString("en-IN");
+
+const upiUrl =
+"upi://pay?pa=pratikshadabhade2011@gmail.com" +
+"&pn=Farm Worker Service" +
+"&am="+total+
+"&cu=INR";
+
+document.getElementById("upiButton").href=upiUrl;
+
+document.getElementById("confirmPayment")
+.addEventListener("click",function(){
+
+const booking = {
+
+id:Date.now(),
+
+requirementId:requirement.id,
+
+employerName:requirement.employerName,
+
+mobile:requirement.mobile,
+
+workersNeeded:requirement.workersNeeded,
+
+hours:requirement.workHours,
+
+amount:total,
+
+status:"Payment Confirmation Pending",
+
+createdAt:new Date().toLocaleString("en-IN")
+
+};
+
+const bookings =
+JSON.parse(localStorage.getItem("farmBookings")||"[]");
+
+bookings.push(booking);
+
+localStorage.setItem(
+"farmBookings",
+JSON.stringify(bookings)
+);
+
+addNotification(
+"Payment Confirmation",
+requirement.employerName+
+" यांनी payment केल्याची confirmation दिली आहे.",
+booking
+);
+
+showMessage(
+"paymentMessage",
+"✅ Booking request successfully submitted. Payment verification pending.",
+"success"
+);
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
