@@ -1,1 +1,7 @@
-
+<div class="payment-qr">
+  <h3>पेमेंट करण्यासाठी QR स्कॅन करा</h3>
+  <p>Google Pay / PhonePe / Paytm</p>
+  <img src="myqr.png"
+       alt="Shetimitra Payment QR"
+       style="width:250px; max-width:100%; height:auto;">
+</div>
