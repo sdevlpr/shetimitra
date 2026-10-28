@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="mr">
 <head>
@@ -72,12 +73,13 @@ href="#">
 
 <div class="qr-area">
 
-<div class="qr-placeholder">
-QR<br>
-PAYMENT
-</div>
+<img
+src="myqr.png"
+alt="Shetimitra UPI Payment QR Code"
+style="display:block;width:250px;max-width:100%;height:auto;margin:20px auto;"
+>
 
-<p>QR scan करून payment करा.</p>
+<p>Google Pay / PhonePe / Paytm मधून QR scan करून payment करा.</p>
 
 </div>
 
@@ -146,7 +148,7 @@ document.getElementById("totalAmount")
 
 const upiUrl =
 "upi://pay?pa=pratikshadabhade2011@gmail.com" +
-"&pn=Farm Worker Service" +
+"&pn=Farm%20Worker%20Service" +
 "&am="+total+
 "&cu=INR";
 
