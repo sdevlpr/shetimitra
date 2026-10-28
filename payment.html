@@ -1,342 +1,272 @@
-
-<!DOCTYPE html>
-<html lang="mr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment</title>
-<link rel="stylesheet" href="css/style.css">
-</head>
-
-<body>
-
-<header class="navbar">
-<div class="logo">🌾 शेतकरी कामगार सेवा</div>
-
-<nav>
-<a href="index.html">मुख्यपृष्ठ</a>
-<a href="find-worker.html">कामगार शोधा</a>
-<a href="requirement.html">कामगाराची मागणी</a>
-<a href="income.html">उत्पन्न</a>
-</nav>
-</header>
-
-<main class="payment-page">
-
-<div class="payment-container">
-
-<div class="form-header">
-<span>SECURE PAYMENT</span>
-<h1>कामाची रक्कम</h1>
-<p>कामगार कामावर येण्यापूर्वी booking payment पूर्ण करा.</p>
-</div>
-
-<div id="requirementDetails"></div>
-
-<div class="payment-box">
-
-<h2>💳 Payment Summary</h2>
-
-<div class="payment-row">
-<span>कामगार</span>
-<strong id="workerNumber">0</strong>
-</div>
-
-<div class="payment-row">
-<span>कामाचे तास</span>
-<strong id="hours">0</strong>
-</div>
-
-<div class="payment-row">
-<span>एकूण रक्कम</span>
-<strong id="totalAmount">₹0</strong>
-</div>
-
-<hr>
-
-<div class="upi-box">
-
-<h3>UPI Payment</h3>
-
-<p>खालील UPI ID वर payment करा:</p>
-
-<div class="upi-id">
-pratikshadabhade2011@gmail.com
-</div>
-
-<a
-id="upiButton"
-class="btn primary full"
-href="#">
-📱 UPI App मधून Pay करा
-</a>
-
-<div class="qr-area">
-
-<img
-src="myqr.png"
-alt="Shetimitra UPI Payment QR Code"
-style="display:block;width:250px;max-width:100%;height:auto;margin:20px auto;"
->
-
-<p>Google Pay / PhonePe / Paytm मधून QR scan करून payment करा.</p>
-
-</div>
-
-</div>
-
-<div class="payment-verification-form">
-  <h3>पेमेंटची पडताळणी</h3>
-
-  <label for="utrNumber">Transaction ID / UTR नंबर *</label>
-  <input
-    type="text"
-    id="utrNumber"
-    placeholder="तुमचा UTR नंबर टाका"
-    maxlength="100"
-    required
-  >
-
-  <label for="paymentScreenshot">पेमेंट स्क्रीनशॉट (ऐच्छिक)</label>
-  <input
-    type="file"
-    id="paymentScreenshot"
-    accept="image/*"
-  >
-
-  <p>पेमेंट तपासल्यानंतरच बुकिंग मंजूर होईल.</p>
-</div>
-  
-<button
-id="confirmPayment"
-class="btn success full">
-✓ Payment केल्यानंतर Booking Confirm करा
-</button>
-
-<div id="paymentMessage"></div>
-
-</div>
-
-</div>
-
-</main>
-
 <script src="js/app.js"></script>
 
 <script>
+const requirement = JSON.parse(
+    localStorage.getItem("selectedRequirement") || "null"
+);
 
-const requirement =
-JSON.parse(localStorage.getItem("selectedRequirement"));
+const totalAmountEl = document.getElementById("totalAmount");
+const workerNumberEl = document.getElementById("workerNumber");
+const hoursEl = document.getElementById("hours");
+const upiButton = document.getElementById("upiButton");
+const confirmButton = document.getElementById("confirmPayment");
+const paymentMessage = document.getElementById("paymentMessage");
 
-  if (requirement) {
-  const workers = Number(requirement.workersNeeded);
-  const hours = Number(requirement.workHours);
+if (!requirement) {
 
-  if (workers > 0 && hours > 0) {
-    const total = 100 * workers * hours;
+    document.getElementById("requirementDetails").innerHTML =
+        '<div class="alert error">कोणतीही active requirement सापडली नाही.</div>';
 
-    document.getElementById("workerNumber").textContent = workers;
-    document.getElementById("hours").textContent = hours + " तास";
-    document.getElementById("totalAmount").textContent =
-      "₹" + total.toLocaleString("en-IN");
-  } else {
-    document.getElementById("totalAmount").textContent =
-      "कामगारांची संख्या किंवा तास उपलब्ध नाहीत";
-  }
-}
+    totalAmountEl.textContent = "₹0";
+    confirmButton.disabled = true;
 
-if(!requirement){
+} else {
 
-document.getElementById("requirementDetails").innerHTML =
-'<div class="alert error">कोणतीही active requirement सापडली नाही.</div>';
+    /* =========================
+       REQUIREMENT DETAILS
+       ========================= */
 
-}else{
+    document.getElementById("requirementDetails").innerHTML = `
+        <div class="requirement-summary">
+            <h3>📋 Requirement Details</h3>
 
-document.getElementById("requirementDetails").innerHTML = `
+            <p>
+                <b>नाव:</b>
+                ${escapeHTML(requirement.employerName || "")}
+            </p>
 
-<div class="requirement-summary">
+            <p>
+                <b>ठिकाण:</b>
+                ${escapeHTML(requirement.location || "")}
+            </p>
 
-<h3>📋 Requirement Details</h3>
+            <p>
+                <b>काम:</b>
+                ${escapeHTML(requirement.workType || "")}
+            </p>
 
-<p><b>नाव:</b> ${escapeHTML(requirement.employerName)}</p>
-
-<p><b>ठिकाण:</b> ${escapeHTML(requirement.location)}</p>
-
-<p><b>काम:</b> ${escapeHTML(requirement.workType)}</p>
-
-<p><b>तारीख:</b> ${escapeHTML(requirement.workDate)}</p>
-
-</div>
-`;
-
-document.getElementById("workerNumber")
-.textContent=requirement.workersNeeded;
-
-document.getElementById("hours")
-.textContent=requirement.workHours+" तास";
-
-const hourlyRate = 800 / 8;
-
-const total =
-hourlyRate *
-requirement.workHours *
-requirement.workersNeeded;
-
-document.getElementById("totalAmount")
-.textContent="₹"+total.toLocaleString("en-IN");
-
-const upiUrl =
-"upi://pay?pa=pratikshadabhade2011@gmail.com" +
-"&pn=Farm%20Worker%20Service" +
-"&am="+total+
-"&cu=INR";
-
-document.getElementById("upiButton").href=upiUrl;
+            <p>
+                <b>तारीख:</b>
+                ${escapeHTML(requirement.workDate || "")}
+            </p>
+        </div>
+    `;
 
 
-document.getElementById("confirmPayment")
-.addEventListener("click", function () {
+    /* =========================
+       GET WORKERS + HOURS
+       ========================= */
 
-  const utr = document.getElementById("utrNumber").value.trim();
-  const screenshot = document.getElementById("paymentScreenshot").files[0];
+    const workers = Number(requirement.workersNeeded);
+    const hours = Number(requirement.workHours);
 
-  if (!utr) {
-    alert("कृपया Transaction ID / UTR नंबर टाका.");
-    return;
-  }
 
-  if (!requirement) {
-    alert("Active requirement सापडली नाही.");
-    return;
-  }
+    /* =========================
+       PAYMENT CALCULATION
+       ₹100 PER HOUR / WORKER
+       ========================= */
 
-  // तुमचा WhatsApp नंबर येथे टाका:
-  // भारतासाठी 91 + 10 अंकी मोबाइल नंबर, + चिन्ह नको.
-  const adminWhatsApp = "const adminWhatsApp = "919876543210";R";
+    if (
+        !Number.isFinite(workers) ||
+        !Number.isFinite(hours) ||
+        workers <= 0 ||
+        hours <= 0
+    ) {
 
-  if (!/^\d{12}$/.test(adminWhatsApp)) {
-    alert("कोडमध्ये तुमचा योग्य WhatsApp नंबर टाका.");
-    return;
-  }
+        workerNumberEl.textContent = workers || 0;
+        hoursEl.textContent = (hours || 0) + " तास";
 
-  const booking = {
-    id: Date.now(),
-    requirementId: requirement.id || null,
-    employerName: requirement.employerName || "",
-    mobile: requirement.mobile || "",
-    workersNeeded: requirement.workersNeeded,
-    hours: requirement.workHours,
-    amount: total,
-    utr: utr,
-    status: "Pending Verification",
-    createdAt: new Date().toLocaleString("en-IN")
-  };
+        totalAmountEl.textContent = "₹0";
 
-  const bookings = JSON.parse(
-    localStorage.getItem("farmBookings") || "[]"
-  );
+        confirmButton.disabled = true;
 
-  bookings.push(booking);
+        paymentMessage.innerHTML = `
+            <div class="alert error">
+                ⚠️ कामगारांची संख्या किंवा कामाचे तास योग्य मिळाले नाहीत.
+            </div>
+        `;
 
-  localStorage.setItem("farmBookings", JSON.stringify(bookings));
+    } else {
 
-  const message =
-    "SHETIMITRA - PAYMENT VERIFICATION REQUEST\n\n" +
-    "Booking ID: " + booking.id + "\n" +
-    "नाव: " + booking.employerName + "\n" +
-    "मोबाइल: " + booking.mobile + "\n" +
-    "ठिकाण: " + (requirement.location || "") + "\n" +
-    "काम: " + (requirement.workType || "") + "\n" +
-    "कामाची तारीख: " + (requirement.workDate || "") + "\n" +
-    "कामगार: " + booking.workersNeeded + "\n" +
-    "तास: " + booking.hours + "\n" +
-    "रक्कम: ₹" + total + "\n" +
-    "UTR / Transaction ID: " + utr + "\n" +
-    "Status: Pending Verification\n\n" +
-    "कृपया बँक/UPI व्यवहार तपासून पेमेंट मंजूर करा.";
+        /* ₹100 × workers × hours */
+        const total = 100 * workers * hours;
 
-  const whatsappURL =
-    "https://wa.me/" + adminWhatsApp +
-    "?text=" + encodeURIComponent(message);
 
-  if (typeof addNotification === "function") {
-    try {
-      addNotification(
-        "Payment Verification Pending",
-        booking.employerName + " यांचे पेमेंट तपासायचे आहे.",
-        booking
-      );
-    } catch (error) {
-      console.error(error);
+        /* =========================
+           SHOW PAYMENT SUMMARY
+           ========================= */
+
+        workerNumberEl.textContent = workers;
+
+        hoursEl.textContent = hours + " तास";
+
+        totalAmountEl.textContent =
+            "₹" + total.toLocaleString("en-IN");
+
+
+        /* =========================
+           UPI PAYMENT LINK
+           ========================= */
+
+        const upiUrl =
+            "upi://pay" +
+            "?pa=pratikshadabhade2011@gmail.com" +
+            "&pn=Farm%20Worker%20Service" +
+            "&am=" + total +
+            "&cu=INR";
+
+        upiButton.href = upiUrl;
+
+
+        /* =========================
+           CONFIRM PAYMENT
+           ========================= */
+
+        confirmButton.addEventListener("click", function () {
+
+            const utrInput =
+                document.getElementById("utrNumber");
+
+            const screenshotInput =
+                document.getElementById("paymentScreenshot");
+
+
+            /* UTR CHECK */
+
+            if (!utrInput || !utrInput.value.trim()) {
+
+                alert("कृपया Payment UTR / Transaction ID टाका.");
+
+                if (utrInput) {
+                    utrInput.focus();
+                }
+
+                return;
+            }
+
+
+            const utr = utrInput.value.trim();
+
+
+            /* =========================
+               ADMIN WHATSAPP NUMBER
+               ========================= */
+
+            const adminWhatsApp = "91XXXXXXXXXX";
+
+
+            if (
+                adminWhatsApp === "91XXXXXXXXXX" ||
+                !/^\d{12}$/.test(adminWhatsApp)
+            ) {
+
+                alert(
+                    "payment.html मध्ये Admin WhatsApp नंबर टाका.\n\n" +
+                    "उदा. 919876543210"
+                );
+
+                return;
+            }
+
+
+            /* =========================
+               BOOKING DATA
+               ========================= */
+
+            const booking = {
+
+                id: Date.now(),
+
+                requirementId: requirement.id,
+
+                employerName:
+                    requirement.employerName || "",
+
+                mobile:
+                    requirement.mobile || "",
+
+                workersNeeded: workers,
+
+                hours: hours,
+
+                amount: total,
+
+                utr: utr,
+
+                status: "Pending Verification",
+
+                createdAt:
+                    new Date().toLocaleString("en-IN")
+            };
+
+
+            /* =========================
+               SAVE BOOKING
+               ========================= */
+
+            const bookings = JSON.parse(
+                localStorage.getItem("farmBookings") || "[]"
+            );
+
+            bookings.push(booking);
+
+            localStorage.setItem(
+                "farmBookings",
+                JSON.stringify(bookings)
+            );
+
+
+            /* =========================
+               WHATSAPP MESSAGE
+               ========================= */
+
+            const message =
+                "🌾 *Farm Worker Booking Payment*%0A%0A" +
+
+                "👤 Employer: " +
+                encodeURIComponent(requirement.employerName || "") +
+
+                "%0A📍 Location: " +
+                encodeURIComponent(requirement.location || "") +
+
+                "%0A🔨 Work: " +
+                encodeURIComponent(requirement.workType || "") +
+
+                "%0A📅 Date: " +
+                encodeURIComponent(requirement.workDate || "") +
+
+                "%0A👷 Workers: " +
+                workers +
+
+                "%0A⏱ Hours: " +
+                hours +
+
+                "%0A💰 Amount: ₹" +
+                total +
+
+                "%0A🧾 UTR: " +
+                encodeURIComponent(utr) +
+
+                "%0A%0A📸 Payment screenshot WhatsApp वर manually attach केला आहे." +
+
+                "%0A%0Aकृपया payment verify करून booking approve करा.";
+
+
+            const whatsappURL =
+                "https://wa.me/" +
+                adminWhatsApp +
+                "?text=" +
+                message;
+
+
+            /* =========================
+               OPEN WHATSAPP
+               ========================= */
+
+            window.location.href = whatsappURL;
+
+        });
+
     }
-  }
-
-  showMessage(
-    "paymentMessage",
-    "पेमेंट तपासणीसाठी WhatsApp उघडत आहे. बुकिंग अजून मंजूर झालेले नाही.",
-    "success"
-  );
-
-  // WhatsApp उघडा
-  window.open(whatsappURL, "_blank");
-
-  if (screenshot) {
-    alert(
-      "WhatsApp उघडल्यानंतर पेमेंटचा स्क्रीनशॉट स्वतः Attach करून पाठवा."
-    );
-  }
-});
-
-const booking = {
-
-id:Date.now(),
-
-requirementId:requirement.id,
-
-employerName:requirement.employerName,
-
-mobile:requirement.mobile,
-
-workersNeeded:requirement.workersNeeded,
-
-hours:requirement.workHours,
-
-amount:total,
-
-status:"Payment Confirmation Pending",
-
-createdAt:new Date().toLocaleString("en-IN")
-
-};
-
-const bookings =
-JSON.parse(localStorage.getItem("farmBookings")||"[]");
-
-bookings.push(booking);
-
-localStorage.setItem(
-"farmBookings",
-JSON.stringify(bookings)
-);
-
-addNotification(
-"Payment Confirmation",
-requirement.employerName+
-" यांनी payment केल्याची confirmation दिली आहे.",
-booking
-);
-
-showMessage(
-"paymentMessage",
-"✅ Booking request successfully submitted. Payment verification pending.",
-"success"
-);
-
-});
-
 }
-
 </script>
-
-</body>
-</html>
