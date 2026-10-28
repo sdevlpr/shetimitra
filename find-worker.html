@@ -1,4 +1,62 @@
 
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>कामगार शोधा | शेतकरी कामगार सेवा</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo">🌾 शेतकरी कामगार सेवा</div>
+  <nav>
+    <a href="index.html">मुख्यपृष्ठ</a>
+    <a href="find-worker.html">कामगार शोधा</a>
+    <a href="add-worker.html">कामगार जोडा</a>
+    <a href="requirement.html">कामगाराची मागणी</a>
+  </nav>
+</header>
+
+<main class="page">
+  <div class="page-heading">
+    <span>FIND WORKER</span>
+    <h1>तुमच्या कामासाठी कामगार शोधा</h1>
+    <p>नाव, गाव, जिल्हा किंवा कामाच्या प्रकारानुसार शोधा.</p>
+  </div>
+
+  <!-- SEARCH AND FILTER -->
+  <div class="search-box">
+    <input
+      type="search"
+      id="searchWorker"
+      placeholder="🔎 नाव / गाव / जिल्हा शोधा..."
+      aria-label="कामगार शोधा"
+    >
+
+    <select id="skillFilter" aria-label="कामाचा प्रकार निवडा">
+      <option value="">सर्व काम</option>
+      <option>शेती काम</option>
+      <option>भाजीपाला काम</option>
+      <option>फळबाग काम</option>
+      <option>कापणी</option>
+      <option>लागवड</option>
+      <option>तण काढणे</option>
+      <option>ट्रॅक्टर काम</option>
+      <option>इतर</option>
+    </select>
+  </div>
+
+  <p id="workerCount" class="worker-count" aria-live="polite"></p>
+
+  <!-- WORKERS -->
+  <div id="workerResults" class="worker-grid">
+    <div class="empty">कामगारांची माहिती लोड होत आहे...</div>
+  </div>
+</main>
+
+<!-- Firebase SDK: load before app.js -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -10,15 +68,22 @@ let allWorkers = [];
 async function loadWorkers() {
   const results = document.getElementById("workerResults");
 
-  results.textContent = "कामगारांची माहिती लोड होत आहे...";
+  results.innerHTML =
+    '<div class="empty">कामगारांची माहिती लोड होत आहे...</div>';
 
   try {
     allWorkers = await getWorkers();
     searchWorkers();
   } catch (error) {
-    console.error("कामगार लोड करण्याची त्रुटी:", error);
-    results.textContent =
-      "कामगारांची माहिती मिळाली नाही. कृपया पेज Refresh करा.";
+    console.error("Worker loading error:", error);
+
+    results.innerHTML =
+      '<div class="empty">' +
+      '<h3>माहिती लोड झाली नाही</h3>' +
+      '<p>इंटरनेट, Firebase Authentication आणि Firestore Rules तपासा.</p>' +
+      '</div>';
+
+    document.getElementById("workerCount").textContent = "";
   }
 }
 
@@ -30,25 +95,29 @@ function searchWorkers() {
 
   const skill = document.getElementById("skillFilter").value;
 
-  const result = allWorkers.filter(w => {
-    const name = (w.name || "").toLowerCase();
-    const village = (w.village || "").toLowerCase();
-    const workerSkill = (w.skill || "").toLowerCase();
-    const district = (w.district || "").toLowerCase();
+  const filteredWorkers = allWorkers.filter(worker => {
+    const name = String(worker.name || "").toLowerCase();
+    const village = String(worker.village || "").toLowerCase();
+    const district = String(worker.district || "").toLowerCase();
+    const workerSkill = String(worker.skill || "").toLowerCase();
 
     const matchesText =
       !text ||
       name.includes(text) ||
       village.includes(text) ||
-      workerSkill.includes(text) ||
-      district.includes(text);
+      district.includes(text) ||
+      workerSkill.includes(text);
 
-    const matchesSkill = !skill || w.skill === skill;
+    const matchesSkill =
+      !skill || worker.skill === skill;
 
     return matchesText && matchesSkill;
   });
 
-  renderWorkerData("workerResults", result);
+  document.getElementById("workerCount").textContent =
+    "एकूण कामगार: " + filteredWorkers.length;
+
+  renderWorkerData("workerResults", filteredWorkers);
 }
 
 document
