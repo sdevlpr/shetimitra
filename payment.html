@@ -128,6 +128,23 @@ class="btn success full">
 const requirement =
 JSON.parse(localStorage.getItem("selectedRequirement"));
 
+  if (requirement) {
+  const workers = Number(requirement.workersNeeded);
+  const hours = Number(requirement.workHours);
+
+  if (workers > 0 && hours > 0) {
+    const total = 100 * workers * hours;
+
+    document.getElementById("workerNumber").textContent = workers;
+    document.getElementById("hours").textContent = hours + " तास";
+    document.getElementById("totalAmount").textContent =
+      "₹" + total.toLocaleString("en-IN");
+  } else {
+    document.getElementById("totalAmount").textContent =
+      "कामगारांची संख्या किंवा तास उपलब्ध नाहीत";
+  }
+}
+
 if(!requirement){
 
 document.getElementById("requirementDetails").innerHTML =
