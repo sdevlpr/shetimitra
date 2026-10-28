@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+
+<div class="logo">🌾 शेतकरी कामगार सेवा</div>
+
+<nav>
+<a href="index.html">मुख्यपृष्ठ</a>
+<a href="find-worker.html">कामगार शोधा</a>
+<a href="add-worker.html">कामगार जोडा</a>
+<a href="requirement.html">कामगाराची मागणी</a>
+<a href="notifications.html">🔔 Notifications</a>
+</nav>
+
+</header>
+
+<main class="page">
+
+<div class="page-heading">
+
+<span>ADMIN NOTIFICATIONS</span>
+
+<h1>🔔 Form Notifications</h1>
+
+<p>
+Website वर कोणत्या व्यक्तीने कोणता form भरला आहे ते येथे दिसेल.
+</p>
+
+</div>
+
+<div class="notification-actions">
+
+<button class="btn danger" onclick="clearNotifications()">
+सर्व Notifications Delete करा
+</button>
+
+</div>
+
+<div id="notificationList"></div>
+
+</main>
+
+<script src="js/app.js"></script>
+
+<script>
+
+function renderNotifications(){
+
+const notifications=getNotifications();
+
+const box=document.getElementById("notificationList");
+
+if(!notifications.length){
+
+box.innerHTML=`
+<div class="empty">
+🔔 अजून कोणतेही notification नाही.
+</div>`;
+
+return;
+
+}
+
+box.innerHTML="";
+
+notifications
+.slice()
+.reverse()
+.forEach(n=>{
+
+box.innerHTML+=`
+
+<div class="notification-card">
+
+<div class="notification-icon">
+🔔
+</div>
+
+<div class="notification-content">
+
+<h3>${escapeHTML(n.title)}</h3>
+
+<p>${escapeHTML(n.message)}</p>
+
+<small>
+${escapeHTML(n.createdAt)}
+</small>
+
+${n.data ? `
+
+<div class="notification-details">
+
+${n.data.name ?
+`<p><b>नाव:</b> ${escapeHTML(n.data.name)}</p>`:""}
+
+${n.data.mobile ?
+`<p><b>Mobile:</b> ${escapeHTML(n.data.mobile)}</p>`:""}
+
+${n.data.employerName ?
+`<p><b>नियोक्ता:</b> ${escapeHTML(n.data.employerName)}</p>`:""}
+
+${n.data.location ?
+`<p><b>ठिकाण:</b> ${escapeHTML(n.data.location)}</p>`:""}
+
+${n.data.workType ?
+`<p><b>काम:</b> ${escapeHTML(n.data.workType)}</p>`:""}
+
+</div>
+
+`:""}
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+function clearNotifications(){
+
+if(confirm("सर्व notifications delete करायचे आहेत का?")){
+
+localStorage.removeItem("farmNotifications");
+
+renderNotifications();
+
+}
+
+}
+
+renderNotifications();
+
+</script>
+
+</body>
+</html>
