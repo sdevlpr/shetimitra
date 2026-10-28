@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>कामगार शोधा</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="navbar">
+<div class="logo">🌾 शेतकरी कामगार सेवा</div>
+
+<nav>
+<a href="index.html">मुख्यपृष्ठ</a>
+<a href="find-worker.html">कामगार शोधा</a>
+<a href="add-worker.html">कामगार जोडा</a>
+<a href="requirement.html">कामगाराची मागणी</a>
+</nav>
+</header>
+
+<main class="page">
+
+<div class="page-heading">
+<span>FIND WORKER</span>
+<h1>तुमच्या कामासाठी कामगार शोधा</h1>
+<p>नाव, गाव किंवा कामाच्या प्रकारानुसार शोधा.</p>
+</div>
+
+<div class="search-box">
+
+<input
+type="text"
+id="searchWorker"
+placeholder="🔎 नाव / गाव / कामाचा प्रकार शोधा..."
+>
+
+<select id="skillFilter">
+<option value="">सर्व काम</option>
+<option>शेती काम</option>
+<option>भाजीपाला काम</option>
+<option>फळबाग काम</option>
+<option>कापणी</option>
+<option>लागवड</option>
+<option>तण काढणे</option>
+<option>ट्रॅक्टर काम</option>
+<option>इतर</option>
+</select>
+
+</div>
+
+<div id="workerResults" class="worker-grid"></div>
+
+</main>
+
+<script src="js/app.js"></script>
+
+<script>
+
+function searchWorkers(){
+
+const text =
+document.getElementById("searchWorker").value
+.toLowerCase()
+.trim();
+
+const skill =
+document.getElementById("skillFilter").value;
+
+const workers = getWorkers();
+
+const result = workers.filter(w => {
+
+const matchesText =
+!text ||
+w.name.toLowerCase().includes(text) ||
+w.village.toLowerCase().includes(text) ||
+w.skill.toLowerCase().includes(text);
+
+const matchesSkill =
+!skill || w.skill === skill;
+
+return matchesText && matchesSkill;
+
+});
+
+renderWorkerData("workerResults", result);
+
+}
+
+document.getElementById("searchWorker")
+.addEventListener("input", searchWorkers);
+
+document.getElementById("skillFilter")
+.addEventListener("change", searchWorkers);
+
+searchWorkers();
+
+</script>
+
+</body>
+</html>
