@@ -148,4 +148,32 @@
 </script>
 
 </body>
+  
+<script type="module">
+  import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
+  import { getFirestore } from
+    "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+  // तुमच्या Firebase Console मधील existing configuration इथे ठेवा.
+  const firebaseConfig = {
+    apiKey: "YOUR_EXISTING_API_KEY",
+    authDomain: "shetimitra-7a3f3.firebaseapp.com",
+    databaseURL: "https://shetimitra-7a3f3-default-rtdb.firebaseio.com",
+    projectId: "shetimitra-7a3f3",
+    storageBucket: "shetimitra-7a3f3.firebasestorage.app",
+    messagingSenderId: "57300259302",
+    appId: "1:57300259302:web:1f56c5c9de5d78373bc627"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // इतर JavaScript files मधून वापरता यावे म्हणून.
+  window.farmWorkerDB = db;
+
+  console.log("Firebase app initialized.");
+</script>
+
 </html>
